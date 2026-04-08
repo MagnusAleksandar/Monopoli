@@ -1,0 +1,23 @@
+{
+    "players":{
+        "1": {
+            "name":"",
+            "email": ""
+        }
+    },
+    "games":{
+        "1221":{
+            "players":[
+                {
+                    "pl_id":"1",
+                    "impostor": true
+                }
+            ],
+            "host_id": "1",
+            "curr_plyr":"1",
+            "cre_date":"01-01-2026",
+            "round_num":1,
+            "status":"init"
+        }
+    }
+}

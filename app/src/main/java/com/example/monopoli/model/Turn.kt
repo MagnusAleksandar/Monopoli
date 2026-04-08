@@ -3,7 +3,7 @@ package com.example.monopoli.model
 import com.example.monopoli.data.Player
 import kotlin.random.Random
 
-class Turn (val player: Player, val interest: Float, val spent: Float){
+class Turn (val player: Player, val interest: Float?, val spent: Float?){
     //      Jugador,            interés del ahorro,  valor gastado
     val possOutcomes = listOf<Char>('g', 'l') // Resultados posibles de invertir (ganar: gain - g, perder: loss - l)
     var mon = player.money

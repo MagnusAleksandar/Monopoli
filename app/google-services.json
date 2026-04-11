@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "614092307232",
+    "project_id": "monopoli-bbc17",
+    "storage_bucket": "monopoli-bbc17.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:614092307232:android:128ebb959b5a5f27cfb545",
+        "android_client_info": {
+          "package_name": "com.example.monopoli"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2axqwF69yJnV1xQu9M-xaSPbTWZTzF34"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

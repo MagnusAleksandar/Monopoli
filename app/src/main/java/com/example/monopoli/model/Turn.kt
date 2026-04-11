@@ -9,8 +9,7 @@ class Turn (val player: Player, val interest: Float?, val spent: Float?){
     var mon = player.money
 
     fun save(){
-        mon =+ mon * interest
-
+        mon += mon * (interest ?: 0f)
     }
 
     fun invest(){
@@ -18,17 +17,15 @@ class Turn (val player: Player, val interest: Float?, val spent: Float?){
         val chng = Random.nextDouble(0.01, 1.00).toFloat()
 
         when (outcome){
-            'g' -> mon =+ mon * chng
-            'l' -> mon =- mon * chng
-            else -> print("Acción no válida")
+            'g' -> mon += mon * chng
+            'l' -> mon -= mon * chng
+            else -> println("Acción no válida")
 
         }
-
     }
 
     fun spend(){
-        mon =- spent
-
+        mon -= (spent ?: 0f)
     }
 
 }

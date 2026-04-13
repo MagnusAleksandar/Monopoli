@@ -1,4 +1,4 @@
-package com.example.monopoli.ui.screens
+package com.example.monopoli.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

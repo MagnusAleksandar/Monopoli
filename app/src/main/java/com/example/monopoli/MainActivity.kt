@@ -16,8 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.monopoli.ui.screens.HomeScreen
-import com.example.monopoli.ui.screens.LoginScreen
+import com.example.monopoli.view.HomeScreen
+import com.example.monopoli.view.LoginScreen
 import com.example.monopoli.ui.theme.MonopoliTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth

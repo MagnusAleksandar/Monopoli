@@ -6,7 +6,26 @@ import kotlin.random.Random
 class Turn (private val player: Player, private val interest: Float, private val spent: Float?){
     //      Jugador,            interés del ahorro,  valor gastado
     val possOutcomes = listOf<Char>('g', 'l') // Resultados posibles de invertir (ganar: gain - g, perder: loss - l)
-//    var mon = player.money
+
+    fun play (currState: GameState, move: String){ // Jugada
+        val currPlayers = currState.players.toMutableList()
+
+        when (move){ // El jugador elige una jugada
+            'u' -> save()
+            'i' -> monUpDown()
+            'd' -> spend()
+        }
+
+        if (Random.nextBoolean()){ // Evento aleatorio
+            monUpDown()
+
+        }
+
+        val nextTurn = (currState.playerNum + 1) % currState.players.size // % hace que vuelva al inicio
+
+        return currState.copy(currPlayers, nextTurn)
+        
+    }
 
     fun save(): Player{ // Ahorrar
         var chng = player.money * interest

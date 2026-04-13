@@ -9,18 +9,13 @@ class Turn (private val player: Player, private val interest: Float, private val
 //    var mon = player.money
 
     fun save(): Player{ // Ahorrar
-        return player.copy(money = player.money * interest)
+        var chng = player.money * interest
+        return player.copy(money = player.money + chng)
     }
 
-    fun monUpDown(choice: Char): Player{ // Cambios al monto de dinero del jugador (invertir, eventos aleatorios)
+    fun monUpDown(): Player{ // Cambios al monto de dinero del jugador (invertir, eventos aleatorios)
         val outcome = possOutcomes.random()
-        val chng: Float
-
-        if (choice != 'y'){
-            chng = player.money * Random.nextDouble(0.01, 1.00).toFloat()
-        }else{
-            chng = player.money * interest
-        }
+        val chng = player.money * Random.nextDouble(0.01, 1.00).toFloat()
 
         when (outcome) {
             'g' -> return player.copy(money = player.money + chng)
@@ -30,6 +25,6 @@ class Turn (private val player: Player, private val interest: Float, private val
     }
 
     fun spend(): Player{ // Gastar
-        return player.copy(money = player.money + (spent ?: 0f))
+        return player.copy(money = player.money - (spent ?: 0f))
     }
 }

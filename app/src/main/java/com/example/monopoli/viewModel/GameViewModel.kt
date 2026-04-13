@@ -18,7 +18,7 @@ class GameViewModel: ViewModel(){
     }
 
     fun onInvest(){
-        _player.value = turn().monUpDown('y')
+        _player.value = turn().monUpDown()
     }
 
     fun onSpend(inc: Float){
@@ -26,6 +26,8 @@ class GameViewModel: ViewModel(){
     }
 
     fun onRandom(){
-        _player.value = turn().monUpDown('n')
+        _player.value = turn().monUpDown()
     }
+
+
 }

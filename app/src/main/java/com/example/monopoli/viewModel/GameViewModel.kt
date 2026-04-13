@@ -11,10 +11,21 @@ class GameViewModel: ViewModel(){
     private val _player = MutableLiveData<Player>(Player("Player"))
     val player: LiveData<Player> = _player
 
-    private fun turn(inc: Float? = null) =  Turn(_player.value!!, INTEREST, inc)
+    private fun turn(inc: Float? = null) = Turn(_player.value!!, INTEREST, inc)
 
-    fun onSave(inc: Float){
-        _player.value = turn(inc).save()
+    fun onSave(){
+        _player.value = turn().save()
     }
 
+    fun onInvest(){
+        _player.value = turn().monUpDown('y')
+    }
+
+    fun onSpend(inc: Float){
+        _player.value = turn(inc).spend()
+    }
+
+    fun onRandom(){
+        _player.value = turn().monUpDown('n')
+    }
 }

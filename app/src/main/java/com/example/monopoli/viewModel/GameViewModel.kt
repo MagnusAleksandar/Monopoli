@@ -3,31 +3,33 @@ package com.example.monopoli.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.monopoli.data.Player
+import com.example.monopoli.model.GameState
+import com.example.monopoli.model.Player
 import com.example.monopoli.model.Turn
 
 class GameViewModel: ViewModel(){
     private val INTEREST = .15f
-    private val _player = MutableLiveData<Player>(Player("Player"))
-    val player: LiveData<Player> = _player
+    private val _gameState = MutableLiveData<GameState>(
+        GameState(listOf(Player("Player1"), Player("Player2")))
+    )
+    val gameState: LiveData<GameState> = _gameState
 
-    private fun turn(inc: Float? = null) = Turn(_player.value!!, INTEREST, inc)
+    private fun turn(inc: Float? = null) = Turn(_gameState.value!!, INTEREST, inc)
 
-    fun onSave(){
-        val newState = turn.save()
-        _gameState.value = newState
+    fun onSave() {
+        _gameState.value = turn().save()
     }
 
     fun onInvest(){
-        _player.value = turn().monUpDown()
+        _gameState.value = turn().monUpDown()
     }
 
     fun onSpend(inc: Float){
-        _player.value = turn(inc).spend()
+        _gameState.value = turn(inc).spend()
     }
 
     fun onRandom(){
-        _player.value = turn().monUpDown()
+        _gameState.value = turn().monUpDown()
     }
 
 }

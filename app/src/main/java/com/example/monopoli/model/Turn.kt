@@ -1,49 +1,69 @@
 package com.example.monopoli.model
 
-import com.example.monopoli.data.Player
+import androidx.compose.ui.unit.TextUnit
 import kotlin.random.Random
+import kotlin.rem
+import kotlin.text.set
 
-class Turn (private val player: Player, private val interest: Float, private val spent: Float?){
-    //      Jugador,            interés del ahorro,  valor gastado
+class Turn (private val gameState: GameState, private val interest: Float, private val spent: Float?){
+    //      Estado actual del jugador,        interés del ahorro/evento,   valor gastado
+    private val player = gameState.currPlayer
     val possOutcomes = listOf<Char>('g', 'l') // Resultados posibles de invertir (ganar: gain - g, perder: loss - l)
 
-    fun play (currState: GameState, move: String){ // Jugada
-        val currPlayers = currState.players.toMutableList()
+    fun play (currState: GameState, move: Char): GameState{ // Jugada
 
-        when (move){ // El jugador elige una jugada
+        var newState = when (move){ // El jugador elige una jugada
             'u' -> save()
             'i' -> monUpDown()
             'd' -> spend()
+            else -> currState // Jugada inválida, estado no cambia
         }
 
         if (Random.nextBoolean()){ // Evento aleatorio
-            monUpDown()
-
+            val secondaryTurn = Turn(newState, interest, spent)
+            newState = secondaryTurn.monUpDown()
         }
 
-        val nextTurn = (currState.playerNum + 1) % currState.players.size // % hace que vuelva al inicio
+        return newState
 
-        return currState.copy(currPlayers, nextTurn)
-        
     }
 
-    fun save(): Player{ // Ahorrar
-        var chng = player.money * interest
-        return player.copy(money = player.money + chng)
+    private fun Player.toNewGameState(): GameState {
+        val updatedPlayers = gameState.players.toMutableList()
+
+        updatedPlayers[gameState.playerNum] = this // Reemplaza el jugador actual con la versión actualizada después del turno (this = versión actualizada)
+
+        val nextPlayer = (gameState.playerNum + 1) % gameState.players.size // Siguiente jugador (% retorna al primero)
+
+        return gameState.copy(players = updatedPlayers, playerNum = nextPlayer)
     }
 
-    fun monUpDown(): Player{ // Cambios al monto de dinero del jugador (invertir, eventos aleatorios)
+    fun save(): GameState{ // Ahorrar
+        val chng = player.money * interest // Dinero más interés fijo
+        return player.copy(money = player.money + chng).toNewGameState()
+
+    }
+
+    fun monUpDown(): GameState{ // Cambios al monto de dinero del jugador (invertir, eventos aleatorios)
         val outcome = possOutcomes.random()
         val chng = player.money * Random.nextDouble(0.01, 1.00).toFloat()
 
+        val updtPlayer: Player
         when (outcome) {
-            'g' -> return player.copy(money = player.money + chng)
-            'l' -> return player.copy(money = player.money - chng)
-            else -> return player.copy()
+            'g' -> {
+                updtPlayer = player.copy(money = player.money + chng)
+                return updtPlayer.toNewGameState()
+            }
+            'l' -> {
+                updtPlayer = player.copy(money = player.money - chng)
+                return updtPlayer.toNewGameState()
+            }
+            else -> return player.copy().toNewGameState()
         }
+
     }
 
-    fun spend(): Player{ // Gastar
-        return player.copy(money = player.money - (spent ?: 0f))
+    fun spend(): GameState{ // Gastar
+        return player.copy(money = player.money - (spent ?: 0f)).toNewGameState()
     }
 }

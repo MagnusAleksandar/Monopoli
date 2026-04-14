@@ -1,97 +1,61 @@
 package com.example.monopoli
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.monopoli.models.AuthUiState
 import com.example.monopoli.view.HomeScreen
 import com.example.monopoli.view.LoginScreen
+import com.example.monopoli.view.RoomScreen
 import com.example.monopoli.ui.theme.MonopoliTheme
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
+import com.example.monopoli.viewmodels.AuthViewModel
+import com.example.monopoli.viewmodels.RoomViewModel
 
 class MainActivity : ComponentActivity() {
-    private lateinit var auth: FirebaseAuth
+
+    private val authViewModel: AuthViewModel by viewModels()
+    private val roomViewModel: RoomViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        auth = Firebase.auth
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MonopoliTheme {
+                // Observamos los estados de los ViewModels para decidir qué pantalla mostrar
+                val authUiState by authViewModel.uiState.collectAsState()
+                val roomState by roomViewModel.roomState.collectAsState()
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-                    var isLogged by remember {mutableStateOf(auth.currentUser != null)}
-                    if (!isLogged) {
-                        LoginScreen(loginClick = { email, password ->
-                            auth.signInWithEmailAndPassword(email, password)
-                                .addOnCompleteListener(this) { task ->
-                                    if (task.isSuccessful) {
-                                        isLogged = true
-                                        Toast.makeText(
-                                            baseContext,
-                                            "Authentication ok.",
-                                            Toast.LENGTH_SHORT,
-                                        ).show()
-                                    } else {
-                                        Toast.makeText(
-                                            baseContext,
-                                            "Authentication failed.",
-                                            Toast.LENGTH_SHORT,
-                                        ).show()
-                                    }
-                                }
-
-                        })
-                    }else{
-                        HomeScreen(
-                            onLogout = {
-                                isLogged = false // 🔥 VUELVE AL LOGIN
-                            }
-                        )
-                        Toast.makeText(
-                            baseContext,
-                            "LogOut OK.",
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                    val modifier = Modifier.padding(innerPadding)
+                    
+                    when {
+                        // 1. Si hay una sala activa, mostramos la pantalla de la sala
+                        roomState != null -> {
+                            RoomScreen(roomViewModel)
+                        }
+                        // 2. Si el usuario está autenticado, mostramos el Home
+                        authUiState is AuthUiState.Success -> {
+                            HomeScreen(
+                                authViewModel = authViewModel,
+                                roomViewModel = roomViewModel,
+                                modifier = modifier
+                            )
+                        }
+                        // 3. Por defecto (o si no hay sesión), mostramos el Login
+                        else -> {
+                            LoginScreen(authViewModel)
+                        }
                     }
-
-
-                    Greeting(
-                        name = "",
-                        modifier = Modifier.padding(innerPadding)
-                    )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = " $name!",
-        modifier = modifier
-    )
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MonopoliTheme {
-        Greeting("Android")
     }
 }

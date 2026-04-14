@@ -1,11 +1,11 @@
-package com.example.monopoli.viewModel
+package com.example.monopoli.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.monopoli.model.GameState
-import com.example.monopoli.model.Player
-import com.example.monopoli.model.Turn
+import com.example.monopoli.models.GameState
+import com.example.monopoli.models.Player
+import com.example.monopoli.models.Turn
 
 class GameViewModel: ViewModel(){
     private val INTEREST = .15f

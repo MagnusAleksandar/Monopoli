@@ -1,4 +1,4 @@
-package com.example.monopoli.model
+package com.example.monopoli.models
 
 import kotlin.random.Random
 

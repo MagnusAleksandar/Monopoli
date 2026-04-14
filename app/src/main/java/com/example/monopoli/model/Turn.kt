@@ -10,13 +10,13 @@ class Turn (private val gameState: GameState, private val interest: Float, priva
     private val player = gameState.currPlayer
     val possOutcomes = listOf<Char>('g', 'l') // Resultados posibles de invertir (ganar: gain - g, perder: loss - l)
 
-    fun play (currState: GameState, move: Char): GameState{ // Jugada
+    fun play (move: Char): GameState?{ // Jugada
 
         var newState = when (move){ // El jugador elige una jugada
             'u' -> save()
             'i' -> monUpDown()
             'd' -> spend()
-            else -> currState // Jugada inválida, estado no cambia
+            else -> return null // Jugada inválida, turno finaliza
         }
 
         if (Random.nextBoolean()){ // Evento aleatorio

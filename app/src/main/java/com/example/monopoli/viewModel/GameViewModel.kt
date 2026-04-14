@@ -16,20 +16,8 @@ class GameViewModel: ViewModel(){
 
     private fun turn(inc: Float? = null) = Turn(_gameState.value!!, INTEREST, inc)
 
-    fun onSave() {
-        _gameState.value = turn().save()
-    }
-
-    fun onInvest(){
-        _gameState.value = turn().monUpDown()
-    }
-
-    fun onSpend(inc: Float){
-        _gameState.value = turn(inc).spend()
-    }
-
-    fun onRandom(){
-        _gameState.value = turn().monUpDown()
+    fun onPlay(choice: Char) {
+        _gameState.value = turn().play( choice)
     }
 
 }

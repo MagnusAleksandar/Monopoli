@@ -1,4 +1,4 @@
-package com.example.monopoli.view
+package com.example.monopoli.ui.theme.Screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,12 +18,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.monopoli.models.AuthUiState
 import com.example.monopoli.viewmodels.AuthViewModel
 import com.example.monopoli.viewmodels.RoomViewModel
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 
 @Composable
 fun HomeScreen(

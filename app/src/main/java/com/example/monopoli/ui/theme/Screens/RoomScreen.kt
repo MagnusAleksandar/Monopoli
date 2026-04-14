@@ -1,4 +1,4 @@
-package com.example.monopoli.view
+package com.example.monopoli.ui.theme.Screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

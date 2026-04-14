@@ -12,9 +12,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.monopoli.models.AuthUiState
-import com.example.monopoli.view.HomeScreen
-import com.example.monopoli.view.LoginScreen
-import com.example.monopoli.view.RoomScreen
+import com.example.monopoli.ui.theme.Screens.HomeScreen
+import com.example.monopoli.ui.theme.Screens.LoginScreen
+import com.example.monopoli.ui.theme.Screens.RoomScreen
 import com.example.monopoli.ui.theme.MonopoliTheme
 import com.example.monopoli.viewmodels.AuthViewModel
 import com.example.monopoli.viewmodels.RoomViewModel

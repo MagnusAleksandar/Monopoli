@@ -1,9 +1,6 @@
 package com.example.monopoli.model
 
-import androidx.compose.ui.unit.TextUnit
 import kotlin.random.Random
-import kotlin.rem
-import kotlin.text.set
 
 class Turn (private val gameState: GameState, private val interest: Float, private val spent: Float?){
     //      Estado actual del jugador,        interés del ahorro/evento,   valor gastado

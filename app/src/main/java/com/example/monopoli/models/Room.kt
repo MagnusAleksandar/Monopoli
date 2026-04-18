@@ -6,3 +6,4 @@ data class Room(
     val status: String = "",
     val players: Map<String, String> = emptyMap()
 )
+

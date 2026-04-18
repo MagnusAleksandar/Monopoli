@@ -1,23 +1,16 @@
 package com.example.monopoli.ui.theme.Screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+
 import com.example.monopoli.models.AuthUiState
 import com.example.monopoli.viewmodels.AuthViewModel
 import com.example.monopoli.viewmodels.RoomViewModel
@@ -36,44 +29,87 @@ fun HomeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .background(Color(0xFF1565C0))
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Bienvenido, ${user?.userEmail ?: "Invitado"}")
-        
-        Spacer(modifier = Modifier.height(32.dp))
 
-        Button(onClick = {
-            user?.let {
-                roomViewModel.createRoom(it.userId, it.userEmail)
-            }
-        }) {
-            Text("Crear sala")
+
+        Text(
+            text = "TÍO RICO",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFFFD600) // amarillo
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            text = "Bienvenido, ${user?.userEmail ?: "Invitado"}",
+            color = Color.White,
+            fontSize = 16.sp
+        )
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+
+        Button(
+            onClick = {
+                user?.let {
+                    roomViewModel.createRoom(it.userId, it.userEmail)
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+        ) {
+            Text("Crear sala", color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+
         OutlinedTextField(
             value = roomCodeInput,
             onValueChange = { roomCodeInput = it },
-            label = { Text("Código de sala") }
+            label = { Text("Código de sala") },
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                focusedBorderColor = Color.Yellow,
+                unfocusedBorderColor = Color.LightGray,
+                focusedLabelColor = Color.Yellow,
+                unfocusedLabelColor = Color.White
+            )
         )
 
-        Button(onClick = {
-            user?.let {
-                roomViewModel.joinRoom(roomCodeInput, it.userId, it.userEmail)
-            }
-        }) {
-            Text("Unirse a sala")
+        Spacer(modifier = Modifier.height(16.dp))
+
+
+        Button(
+            onClick = {
+                user?.let {
+                    roomViewModel.joinRoom(roomCodeInput, it.userId, it.userEmail)
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
+        ) {
+            Text("Unirse a sala", color = Color.White)
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(30.dp))
 
-        Button(onClick = {
-            authViewModel.logout()
-        }) {
-            Text("Cerrar sesión")
+
+        Button(
+            onClick = {
+                authViewModel.logout()
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
+        ) {
+            Text("Cerrar sesión", color = Color.White)
         }
     }
 }

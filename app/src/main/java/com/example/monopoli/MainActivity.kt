@@ -8,10 +8,13 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
 import com.example.monopoli.models.AuthUiState
+import com.example.monopoli.models.GameState
 import com.example.monopoli.ui.theme.Screens.HomeScreen
 import com.example.monopoli.ui.theme.Screens.LoginScreen
 import com.example.monopoli.ui.theme.Screens.RoomScreen
@@ -35,7 +38,7 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val modifier = Modifier.padding(innerPadding)
-                    
+
                     when {
                         // 1. Si hay una sala activa, mostramos la pantalla de la sala
                         roomState != null -> {

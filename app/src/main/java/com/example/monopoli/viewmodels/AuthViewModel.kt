@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AuthViewModel: ViewModel() {
-
+    object NavigateToRegister : UiEvent()
     private val repository = AuthRepository()
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState = _uiState.asStateFlow()
@@ -59,11 +59,34 @@ class AuthViewModel: ViewModel() {
             _eventFlow.emit(UiEvent.NavigateToLogin)
         }
     }
+    fun register(email: String, pass: String) {
+        if (email.isBlank() || pass.isBlank()) {
+            _uiState.value = AuthUiState.Error("Campos vacíos")
+            return
+        }
 
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+
+            val result = repository.register(email, pass)
+
+            if (result.isSuccess) {
+                val (uid, userEmail) = result.getOrThrow()
+                _uiState.value = AuthUiState.Success(uid, userEmail)
+                _eventFlow.emit(UiEvent.NavigateToHome)
+            } else {
+                _uiState.value = AuthUiState.Error(
+                    result.exceptionOrNull()?.message ?: "Error desconocido"
+                )
+                _eventFlow.emit(UiEvent.ShowSnackbar("Error al registrarse"))
+            }
+        }
+    }
 
     sealed class UiEvent {
         object NavigateToHome : UiEvent()
         object NavigateToLogin : UiEvent()
+        object NavigateToRegister : UiEvent()
         data class ShowSnackbar(val message: String) : UiEvent()
     }
 }

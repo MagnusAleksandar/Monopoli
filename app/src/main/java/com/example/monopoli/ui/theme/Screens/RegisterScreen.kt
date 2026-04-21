@@ -13,20 +13,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 import com.example.monopoli.R
 import com.example.monopoli.models.AuthUiState
 import com.example.monopoli.viewmodels.AuthViewModel
 
 @Composable
-fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
-
+fun RegisterScreen(
+    viewModel: AuthViewModel,
+    onNavigateBack: () -> Unit
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var localError by remember { mutableStateOf<String?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -45,7 +49,6 @@ fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
 
-
             Text(
                 text = "TÍO RICO",
                 fontSize = 36.sp,
@@ -53,8 +56,17 @@ fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
                 color = Color(0xFFFF0000)
             )
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Crear cuenta",
+                fontSize = 18.sp,
+                color = Color.White
+            )
+
             Spacer(modifier = Modifier.height(30.dp))
 
+            // Campo email
             TextField(
                 value = email,
                 onValueChange = { email = it },
@@ -73,10 +85,32 @@ fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Campo contraseña
             TextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password", color = Color(0xFFF60505)) },
+                label = { Text("Contraseña", color = Color(0xFFFF0000)) },
+                visualTransformation = PasswordVisualTransformation(),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    cursorColor = Color(0xFFFF0000),
+                    focusedIndicatorColor = Color(0xFFFF0000),
+                    unfocusedIndicatorColor = Color.Gray
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Campo confirmar contraseña
+            TextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = { Text("Confirmar contraseña", color = Color(0xFFFF0000)) },
+                visualTransformation = PasswordVisualTransformation(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
                     unfocusedContainerColor = Color.White,
@@ -91,25 +125,35 @@ fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
 
             Spacer(modifier = Modifier.height(30.dp))
 
+            // Botón registrarse
             Button(
-                onClick = { viewModel.login(email, password) },
+                onClick = {
+                    localError = null
+                    when {
+                        password.length < 6 ->
+                            localError = "La contraseña debe tener al menos 6 caracteres"
+                        password != confirmPassword ->
+                            localError = "Las contraseñas no coinciden"
+                        else -> viewModel.register(email, password)
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = uiState !is AuthUiState.Loading,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
             ) {
-                Text("Iniciar Sesión", color = Color.White)
+                Text("Registrarse", color = Color.White)
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            TextButton(onClick = onNavigateToRegister) {
+            // Errores locales (contraseñas no coinciden, etc.)
+            localError?.let {
                 Text(
-                    text = "¿No tienes cuenta? Regístrate",
-                    color = Color.White,
-                    fontSize = 14.sp
+                    text = it,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
 
+            // Errores del ViewModel (Firebase)
             if (uiState is AuthUiState.Error) {
                 Text(
                     text = (uiState as AuthUiState.Error).message,
@@ -117,8 +161,19 @@ fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            TextButton(onClick = onNavigateBack) {
+                Text(
+                    text = "¿Ya tienes cuenta? Inicia sesión",
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
+            }
         }
 
+        // Loading overlay
         if (uiState is AuthUiState.Loading) {
             Box(
                 modifier = Modifier
@@ -132,8 +187,5 @@ fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
                 )
             }
         }
-
     }
 }
-
-

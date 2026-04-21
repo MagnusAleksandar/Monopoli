@@ -28,4 +28,16 @@ class AuthRepository {
         val user = auth.currentUser
         return user?.let { Pair(it.uid, it.email ?: "") }
     }
+
+    suspend fun register(email: String, password: String): Result<Pair<String, String>> {
+        return try {
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val user = result.user
+            val userId = user?.uid ?: ""
+            val userEmail = user?.email ?: "Usuario desconocido"
+            Result.success(Pair(userId, userEmail))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

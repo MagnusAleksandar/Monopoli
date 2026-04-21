@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
-
 import com.example.monopoli.models.AuthUiState
 import com.example.monopoli.viewmodels.AuthViewModel
 import com.example.monopoli.viewmodels.RoomViewModel
@@ -22,6 +21,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val authState by authViewModel.uiState.collectAsState()
+    val joinError by roomViewModel.joinError.collectAsState()
+
     var roomCodeInput by remember { mutableStateOf("") }
 
     val user = (authState as? AuthUiState.Success)
@@ -35,12 +36,11 @@ fun HomeScreen(
         verticalArrangement = Arrangement.Center
     ) {
 
-
         Text(
             text = "TÍO RICO",
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFFFFD600) // amarillo
+            color = Color(0xFFFFD600)
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -52,7 +52,6 @@ fun HomeScreen(
         )
 
         Spacer(modifier = Modifier.height(30.dp))
-
 
         Button(
             onClick = {
@@ -68,24 +67,36 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
         OutlinedTextField(
             value = roomCodeInput,
-            onValueChange = { roomCodeInput = it },
+            onValueChange = {
+                roomCodeInput = it
+                // Limpiar error al escribir
+                if (joinError != null) roomViewModel.clearJoinError()
+            },
             label = { Text("Código de sala") },
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
-                focusedBorderColor = Color.Yellow,
-                unfocusedBorderColor = Color.LightGray,
+                focusedBorderColor = if (joinError != null) Color.Red else Color.Yellow,
+                unfocusedBorderColor = if (joinError != null) Color.Red else Color.LightGray,
                 focusedLabelColor = Color.Yellow,
                 unfocusedLabelColor = Color.White
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        // Error al unirse
+        joinError?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
 
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
@@ -94,6 +105,7 @@ fun HomeScreen(
                 }
             },
             modifier = Modifier.fillMaxWidth(),
+            enabled = roomCodeInput.isNotBlank(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
         ) {
             Text("Unirse a sala", color = Color.White)
@@ -101,11 +113,8 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(30.dp))
 
-
         Button(
-            onClick = {
-                authViewModel.logout()
-            },
+            onClick = { authViewModel.logout() },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
         ) {

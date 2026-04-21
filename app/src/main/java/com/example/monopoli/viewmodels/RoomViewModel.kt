@@ -15,8 +15,15 @@ class RoomViewModel : ViewModel() {
     private val _roomState = MutableStateFlow<Room?>(null)
     val roomState = _roomState.asStateFlow()
 
+    private val _roomCode = MutableStateFlow<String?>(null)
+    val roomCode = _roomCode.asStateFlow()
+
+    private val _joinError = MutableStateFlow<String?>(null)
+    val joinError = _joinError.asStateFlow()
+
     fun createRoom(userId: String, userName: String) {
         val code = generateRoomCode()
+        _roomCode.value = code
         repository.createRoom(code, userId, userName)
         listenRoom(code)
     }
@@ -25,7 +32,11 @@ class RoomViewModel : ViewModel() {
         viewModelScope.launch {
             val result = repository.joinRoom(code, userId, userName)
             if (result.isSuccess) {
+                _roomCode.value = code
+                _joinError.value = null
                 listenRoom(code)
+            } else {
+                _joinError.value = result.exceptionOrNull()?.message ?: "Error al unirse"
             }
         }
     }
@@ -42,5 +53,11 @@ class RoomViewModel : ViewModel() {
 
     fun leaveRoom() {
         _roomState.value = null
+        _roomCode.value = null
+        _joinError.value = null
+    }
+
+    fun clearJoinError() {
+        _joinError.value = null
     }
 }

@@ -82,6 +82,7 @@ fun GameScreen(gameViewModel: GameViewModel, myPlayerId: String?) {
         Spacer(modifier = Modifier.height(10.dp))
 
         Button(
+            enabled = isMyTurn && !isGameFinished,
             onClick = { gameViewModel.onPlay('i', myPlayerId) },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
@@ -92,6 +93,7 @@ fun GameScreen(gameViewModel: GameViewModel, myPlayerId: String?) {
         Spacer(modifier = Modifier.height(10.dp))
 
         Button(
+            enabled = isMyTurn && !isGameFinished,
             onClick = { gameViewModel.onPlay('d', myPlayerId) },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))

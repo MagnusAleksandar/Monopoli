@@ -20,7 +20,7 @@ import com.example.monopoli.repositories.RoomRepository
 
         fun initGame(players: Map<String, String>) {
             val playerList = players.map { (id, name) ->
-                Player(name = name, id = id)
+                Player(name = name, id = id, playing = true)
             }
             _gameState.value = GameState(playerList)
         }

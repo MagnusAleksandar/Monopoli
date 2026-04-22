@@ -27,12 +27,37 @@ class Turn (private val gameState: GameState, private val interest: Float, priva
 
     private fun Player.toNewGameState(): GameState {
         val updatedPlayers = gameState.players.toMutableList()
+        val updatedTurns = gameState.turns.toMutableList()
 
-        updatedPlayers[gameState.playerNum] = this // Reemplaza el jugador actual con la versión actualizada después del turno (this = versión actualizada)
+        // Actualiza jugador
+        updatedPlayers[gameState.playerNum] = this
 
-        val nextPlayer = (gameState.playerNum + 1) % gameState.players.size // Siguiente jugador (% retorna al primero)
+        // Siguiente turno
+        updatedTurns[gameState.playerNum] += 1
 
-        return gameState.copy(players = updatedPlayers, playerNum = nextPlayer)
+        // Elimina jugador cuando no tiene dinero
+        if (this.money <= 0f) {
+            updatedPlayers[gameState.playerNum] =
+                this.copy(playing = false)
+        }
+
+        // Revisa si todos los jugadores están eliminados
+        val gameFinished = updatedPlayers.indices.all { i ->
+            updatedTurns[i] >= 5 || !updatedPlayers[i].playing
+        }
+
+        // Siguiente jugador
+        var nextPlayer = gameState.playerNum
+        do {
+            nextPlayer = (nextPlayer + 1) % updatedPlayers.size
+        } while (!updatedPlayers[nextPlayer].playing && !gameFinished)
+
+        return gameState.copy(
+            players = updatedPlayers,
+            turns = updatedTurns,
+            playerNum = nextPlayer,
+            isFinished = gameFinished
+        )
     }
 
     fun save(): GameState{ // Ahorrar
@@ -52,7 +77,8 @@ class Turn (private val gameState: GameState, private val interest: Float, priva
                 return updtPlayer.toNewGameState()
             }
             'l' -> {
-                updtPlayer = player.copy(money = player.money - chng)
+                val newMoney = maxOf(0f, player.money - chng)
+                updtPlayer = player.copy(money = newMoney)
                 return updtPlayer.toNewGameState()
             }
             else -> return player.copy().toNewGameState()

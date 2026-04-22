@@ -12,13 +12,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import com.example.monopoli.models.AuthUiState
 
 import com.example.monopoli.viewmodels.GameViewModel
 
 @Composable
-fun GameScreen(gameViewModel: GameViewModel) {
+fun GameScreen(gameViewModel: GameViewModel, myPlayerId: String?) {
 
     val gameState by gameViewModel.gameState.observeAsState()
+    val isMyTurn = gameState?.currPlayer?.id == myPlayerId
+    val isGameFinished = gameState?.isFinished == true
 
     Column(
         modifier = Modifier
@@ -68,7 +71,8 @@ fun GameScreen(gameViewModel: GameViewModel) {
 
         // 🎮 BOTONES
         Button(
-            onClick = { gameViewModel.onPlay('u') },
+            enabled = isMyTurn && !isGameFinished,
+            onClick = { gameViewModel.onPlay('u', myPlayerId) },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
         ) {
@@ -78,7 +82,7 @@ fun GameScreen(gameViewModel: GameViewModel) {
         Spacer(modifier = Modifier.height(10.dp))
 
         Button(
-            onClick = { gameViewModel.onPlay('i') },
+            onClick = { gameViewModel.onPlay('i', myPlayerId) },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
         ) {
@@ -88,7 +92,7 @@ fun GameScreen(gameViewModel: GameViewModel) {
         Spacer(modifier = Modifier.height(10.dp))
 
         Button(
-            onClick = { gameViewModel.onPlay('d') },
+            onClick = { gameViewModel.onPlay('d', myPlayerId) },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
         ) {

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -31,7 +32,8 @@ object Routes {
 fun AppNavigation(
     authViewModel: AuthViewModel,
     roomViewModel: RoomViewModel,
-    gameViewModel: GameViewModel
+    gameViewModel: GameViewModel,
+    modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
 
@@ -88,7 +90,8 @@ fun AppNavigation(
 
     NavHost(
         navController = navController,
-        startDestination = if (authState is AuthUiState.Success) Routes.HOME else Routes.LOGIN
+        startDestination = if (authState is AuthUiState.Success) Routes.HOME else Routes.LOGIN,
+        modifier = modifier
     ) {
         composable(Routes.LOGIN) {
             LoginScreen(
@@ -120,7 +123,7 @@ fun AppNavigation(
         }
 
         composable(Routes.GAME) {
-            GameScreen(gameViewModel = gameViewModel)
+            GameScreen(gameViewModel = gameViewModel, currentUserId)
         }
 
         composable(Routes.RESULT) {

@@ -1,5 +1,6 @@
 package com.example.monopoli.repositories
 
+import com.example.monopoli.models.GameState
 import com.example.monopoli.models.Room
 import com.google.firebase.database.*
 import com.google.firebase.database.FirebaseDatabase
@@ -58,6 +59,16 @@ class RoomRepository {
 
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val room = snapshot.getValue(Room::class.java)
+                    /* Si el host sale (sugerencia de como manejarlo)
+                    val hostId = snapshot.child("host_id").getValue(String::class.java)
+                    val players = snapshot.child("players").children.mapNotNull {
+                        it.key
+                    }
+
+                    if (hostId != null && !players.contains(hostId)) {
+                        endGame(roomCode)
+                    }
+                    */
                     if (room != null) {
                         onChange(room)
                     }
@@ -69,6 +80,25 @@ class RoomRepository {
 
     fun startGame(roomCode: String) {
         db.child("rooms").child(roomCode).child("status").setValue("playing")
+    }
+
+    fun endGame(roomCode: String){
+        // código que elimina la sala
+    }
+
+    fun updateGameState(roomCode: String, newState: GameState){
+        // código que actualiza la sala
+        /* Sugerencia de GPT:
+        val gameRef = database.child("games").child(roomCode)
+
+        val data = mapOf(
+            "curr_player" to gameState.currPlayer.id,
+            "round_num" to gameState.turns.maxOrNull(),
+            "status" to if (gameState.isFinished) "finished" else "playing"
+        )
+
+        gameRef.updateChildren(data)
+         */
     }
 
 }

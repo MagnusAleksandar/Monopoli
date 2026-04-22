@@ -31,6 +31,7 @@ class MainActivity : ComponentActivity() {
                         authViewModel = authViewModel,
                         roomViewModel = roomViewModel,
                         gameViewModel = gameViewModel,
+                        modifier = Modifier.padding(innerPadding)
                     )
                 }
             }

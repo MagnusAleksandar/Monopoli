@@ -48,6 +48,13 @@ class RoomViewModel : ViewModel() {
     private fun listenRoom(code: String) {
         repository.listenRoom(code) { room ->
             _roomState.value = room
+
+            val hostStillExists = room.players.containsKey(room.host) // si el host se va, acaba el juego
+            if (!hostStillExists) {
+                _gameStarted.value = false
+                return@listenRoom
+            }
+
             if (room.status == "playing") {
                 _gameStarted.value = true
             }

@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -23,12 +24,12 @@ import com.example.monopoli.viewmodels.AuthViewModel
 @Composable
 fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
 
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState() //Enviamos los estados al ViewModel
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) { //Como un snack
 
         Image(
             painter = painterResource(R.drawable.fondo2),
@@ -37,14 +38,13 @@ fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
             contentScale = ContentScale.Crop
         )
 
-        Column(
+        Column( //Layout principal
             modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-
 
             Text(
                 text = "TÍO RICO",
@@ -57,7 +57,7 @@ fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
 
             TextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = { email = it }, //Actualiza email
                 label = { Text("E-mail", color = Color(0xFFFF0000)) },
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.White,
@@ -84,17 +84,19 @@ fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
                     unfocusedTextColor = Color.Black,
                     cursorColor = Color(0xFFFF0000),
                     focusedIndicatorColor = Color(0xFFFF0000),
-                    unfocusedIndicatorColor = Color.Gray
+                    unfocusedIndicatorColor = Color.Gray,
+
                 ),
+                visualTransformation = PasswordVisualTransformation(),//Para que la contraseña no se vea
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(30.dp))
 
             Button(
-                onClick = { viewModel.login(email, password) },
+                onClick = { viewModel.login(email, password) }, //Llamamos al viewmodel, y la funcion login e insertamos los datos
                 modifier = Modifier.fillMaxWidth(),
-                enabled = uiState !is AuthUiState.Loading,
+                enabled = uiState !is AuthUiState.Loading, //El boton se desactiva mientras carga
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
             ) {
                 Text("Iniciar Sesión", color = Color.White)
@@ -102,15 +104,16 @@ fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            TextButton(onClick = onNavigateToRegister) {
-                Text(
-                    text = "¿No tienes cuenta? Regístrate",
-                    color = Color.White,
-                    fontSize = 14.sp
-                )
+            Button(
+                onClick = onNavigateToRegister,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = uiState !is AuthUiState.Loading,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
+            ) {
+                Text("Regístrate", color = Color.White)
             }
 
-            if (uiState is AuthUiState.Error) {
+            if (uiState is AuthUiState.Error) { // Si el estado es error lo mostramos en pantalla
                 Text(
                     text = (uiState as AuthUiState.Error).message,
                     color = Color.Red,
@@ -119,7 +122,7 @@ fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
             }
         }
 
-        if (uiState is AuthUiState.Loading) {
+        if (uiState is AuthUiState.Loading) { // Hacemos una animacion para que se vea el estado de carga
             Box(
                 modifier = Modifier
                     .fillMaxSize()

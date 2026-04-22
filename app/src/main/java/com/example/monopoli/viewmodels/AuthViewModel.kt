@@ -11,20 +11,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AuthViewModel: ViewModel() {
-    object NavigateToRegister : UiEvent()
-    private val repository = AuthRepository()
-    private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
-    val uiState = _uiState.asStateFlow()
+    private val repository = AuthRepository() //Creamos conexion con el repo
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    // Usada en cambios de pantalla, se dibuja automaticamente
+    private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle) //Interno, evita qeu UI modifique el estado
+    val uiState = _uiState.asStateFlow()// Solo lectura
+
+    private val _eventFlow = MutableSharedFlow<UiEvent>() //MUestra el Snackbar
 
     init {
-        checkSession()
+        checkSession()// Se ejcuta al crear el ViewModel
     }
 
-    private fun checkSession() {
-        val user = repository.getCurrentUser()
+    private fun checkSession() { // Si el usueario ya estaba logeado va directo al home
+        val user = repository.getCurrentUser() // pregunta si el usuario ya inicio sesion en el repo
         if (user != null) {
             _uiState.value = AuthUiState.Success(user.first, user.second)
         }
@@ -36,15 +36,15 @@ class AuthViewModel: ViewModel() {
             return
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch { // Ejecuta un codigo async y se cancela automaticamente si el viewmodel muere
             _uiState.value = AuthUiState.Loading
 
-            val result = repository.login(email, pass)
+            val result = repository.login(email, pass) //Llama a firebase y a la funcion loguarsse
 
             if (result.isSuccess) {
-                val (uid, userEmail) = result.getOrThrow()
+                val (uid, userEmail) = result.getOrThrow() // Obtiene si todo esta bien
                 _uiState.value = AuthUiState.Success(uid, userEmail)
-                _eventFlow.emit(UiEvent.NavigateToHome)
+                _eventFlow.emit(UiEvent.NavigateToHome) // Como es correcto entonces vamos al siguietne evento que es  HOME
             } else {
                 _uiState.value = AuthUiState.Error(result.exceptionOrNull()?.message ?: "Error desconocido")
                 _eventFlow.emit(UiEvent.ShowSnackbar("Error al iniciar sesión"))
@@ -54,9 +54,9 @@ class AuthViewModel: ViewModel() {
 
     fun logout() {
         viewModelScope.launch {
-            repository.logout()
-            _uiState.value = AuthUiState.Idle
-            _eventFlow.emit(UiEvent.NavigateToLogin)
+            repository.logout() // Llama la funcion
+            _uiState.value = AuthUiState.Idle //Estado inicial
+            _eventFlow.emit(UiEvent.NavigateToLogin) //Evente (Login)
         }
     }
     fun register(email: String, pass: String) {
@@ -64,7 +64,6 @@ class AuthViewModel: ViewModel() {
             _uiState.value = AuthUiState.Error("Campos vacíos")
             return
         }
-
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
 
@@ -83,6 +82,7 @@ class AuthViewModel: ViewModel() {
         }
     }
 
+    //Es como una lista cerrada de oportunidades o eventos
     sealed class UiEvent {
         object NavigateToHome : UiEvent()
         object NavigateToLogin : UiEvent()

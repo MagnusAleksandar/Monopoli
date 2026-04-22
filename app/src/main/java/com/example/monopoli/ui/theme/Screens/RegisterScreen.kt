@@ -25,12 +25,12 @@ fun RegisterScreen(
     viewModel: AuthViewModel,
     onNavigateBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()//Escuchamos al   Stateflow
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var localError by remember { mutableStateOf<String?>(null) }
+    var localError by remember { mutableStateOf<String?>(null) } // Creados para error de contraseña
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -134,7 +134,7 @@ fun RegisterScreen(
                             localError = "La contraseña debe tener al menos 6 caracteres"
                         password != confirmPassword ->
                             localError = "Las contraseñas no coinciden"
-                        else -> viewModel.register(email, password)
+                        else -> viewModel.register(email, password) // Si todo lo anterior esta bien llamamos a la funcion registrar
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -156,7 +156,7 @@ fun RegisterScreen(
             // Errores del ViewModel (Firebase)
             if (uiState is AuthUiState.Error) {
                 Text(
-                    text = (uiState as AuthUiState.Error).message,
+                    text = (uiState as AuthUiState.Error).message, // Sacamo un mensaje de error del estado
                     color = Color.Red,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -164,7 +164,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            TextButton(onClick = onNavigateBack) {
+            TextButton(onClick = onNavigateBack) { // Boton para devolvernos
                 Text(
                     text = "¿Ya tienes cuenta? Inicia sesión",
                     color = Color.White,
@@ -174,7 +174,7 @@ fun RegisterScreen(
         }
 
         // Loading overlay
-        if (uiState is AuthUiState.Loading) {
+        if (uiState is AuthUiState.Loading) { //Bloquea la pantalla y muestra la animacion de carga (spiner)
             Box(
                 modifier = Modifier
                     .fillMaxSize()

@@ -21,6 +21,9 @@ class RoomViewModel : ViewModel() {
     private val _joinError = MutableStateFlow<String?>(null)
     val joinError = _joinError.asStateFlow()
 
+    private val _gameStarted = MutableStateFlow(false)
+    val gameStarted = _gameStarted.asStateFlow()
+
     fun createRoom(userId: String, userName: String) {
         val code = generateRoomCode()
         _roomCode.value = code
@@ -41,10 +44,23 @@ class RoomViewModel : ViewModel() {
         }
     }
 
+    // ✅ Una sola versión con toda la lógica
     private fun listenRoom(code: String) {
-        repository.listenRoom(code) {
-            _roomState.value = it
+        repository.listenRoom(code) { room ->
+            _roomState.value = room
+            if (room.status == "playing") {
+                _gameStarted.value = true
+            }
         }
+    }
+
+    fun startGame() {
+        val code = _roomCode.value ?: return
+        repository.startGame(code)
+    }
+
+    fun resetGameStarted() {
+        _gameStarted.value = false
     }
 
     private fun generateRoomCode(): String {
@@ -55,6 +71,7 @@ class RoomViewModel : ViewModel() {
         _roomState.value = null
         _roomCode.value = null
         _joinError.value = null
+        _gameStarted.value = false
     }
 
     fun clearJoinError() {

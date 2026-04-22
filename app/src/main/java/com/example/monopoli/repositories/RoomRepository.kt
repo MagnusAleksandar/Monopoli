@@ -67,5 +67,8 @@ class RoomRepository {
             })
     }
 
+    fun startGame(roomCode: String) {
+        db.child("rooms").child(roomCode).child("status").setValue("playing")
+    }
 
 }

@@ -8,15 +8,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.monopoli.models.AuthUiState
+import com.example.monopoli.ui.theme.Screens.GameScreen
+import com.example.monopoli.ui.theme.Screens.HomeScreen
+import com.example.monopoli.ui.theme.Screens.LoginScreen
+import com.example.monopoli.ui.theme.Screens.RegisterScreen
+import com.example.monopoli.ui.theme.Screens.ResultScreen
+import com.example.monopoli.ui.theme.Screens.RoomScreen
 import com.example.monopoli.viewmodels.AuthViewModel
 import com.example.monopoli.viewmodels.GameViewModel
 import com.example.monopoli.viewmodels.RoomViewModel
-import com.example.monopoli.ui.theme.Screens.LoginScreen
-import com.example.monopoli.ui.theme.Screens.RegisterScreen
-import com.example.monopoli.ui.theme.Screens.HomeScreen
-import com.example.monopoli.ui.theme.Screens.RoomScreen
-import com.example.monopoli.ui.theme.Screens.GameScreen
-import com.example.monopoli.ui.theme.Screens.ResultScreen
 
 object Routes {
     const val LOGIN = "login"
@@ -34,8 +34,12 @@ fun AppNavigation(
     gameViewModel: GameViewModel
 ) {
     val navController = rememberNavController()
+
     val authState by authViewModel.uiState.collectAsState()
     val roomState by roomViewModel.roomState.collectAsState()
+    val gameStarted by roomViewModel.gameStarted.collectAsState()
+
+    val currentUserId = (authState as? AuthUiState.Success)?.userId ?: ""
 
     // Navegación reactiva según el estado de auth
     LaunchedEffect(authState) {
@@ -61,11 +65,23 @@ fun AppNavigation(
                 popUpTo(Routes.HOME) { inclusive = false }
             }
         } else {
-            // Si sale de la sala, vuelve al home si está autenticado
             if (authState is AuthUiState.Success) {
                 navController.navigate(Routes.HOME) {
                     popUpTo(Routes.ROOM) { inclusive = true }
                 }
+            }
+        }
+    }
+
+    // Navegación cuando el host inicia el juego
+    LaunchedEffect(gameStarted) {
+        if (gameStarted) {
+            roomState?.players?.let { players ->
+                gameViewModel.initGame(players)
+            }
+            roomViewModel.resetGameStarted()
+            navController.navigate(Routes.GAME) {
+                popUpTo(Routes.ROOM) { inclusive = false }
             }
         }
     }
@@ -96,7 +112,11 @@ fun AppNavigation(
         }
 
         composable(Routes.ROOM) {
-            RoomScreen(viewModel = roomViewModel)
+            RoomScreen(
+                viewModel = roomViewModel,
+                gameViewModel = gameViewModel,
+                currentUserId = currentUserId
+            )
         }
 
         composable(Routes.GAME) {

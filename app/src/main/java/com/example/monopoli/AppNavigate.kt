@@ -33,12 +33,12 @@ fun AppNavigation(
     roomViewModel: RoomViewModel,
     gameViewModel: GameViewModel
 ) {
-    val navController = rememberNavController()
+    val navController = rememberNavController() // Ayuda a controlar la navegacion entre screens
 
     val authState by authViewModel.uiState.collectAsState()
     val roomState by roomViewModel.roomState.collectAsState()
     val gameStarted by roomViewModel.gameStarted.collectAsState()
-
+    // Verificamos si en el auth satate hay un usuario logeado, si si nos devuevle el userID
     val currentUserId = (authState as? AuthUiState.Success)?.userId ?: ""
 
     // Navegación reactiva según el estado de auth
@@ -49,6 +49,7 @@ fun AppNavigation(
                     popUpTo(Routes.LOGIN) { inclusive = true }
                 }
             }
+            // Si no lo manda de nuevo al login
             is AuthUiState.Idle -> {
                 navController.navigate(Routes.LOGIN) {
                     popUpTo(0) { inclusive = true }
@@ -61,11 +62,13 @@ fun AppNavigation(
     // Navegación reactiva según estado de sala
     LaunchedEffect(roomState) {
         if (roomState != null) {
+            //Ingresamos si la sala existe
             navController.navigate(Routes.ROOM) {
                 popUpTo(Routes.HOME) { inclusive = false }
             }
         } else {
             if (authState is AuthUiState.Success) {
+                // Si no volveos al Home
                 navController.navigate(Routes.HOME) {
                     popUpTo(Routes.ROOM) { inclusive = true }
                 }
@@ -75,11 +78,13 @@ fun AppNavigation(
 
     // Navegación cuando el host inicia el juego
     LaunchedEffect(gameStarted) {
+        //Empezamos a jugar
         if (gameStarted) {
             roomState?.players?.let { players ->
                 gameViewModel.initGame(players)
             }
             roomViewModel.resetGameStarted()
+            //Vamos a la ruta de game
             navController.navigate(Routes.GAME) {
                 popUpTo(Routes.ROOM) { inclusive = false }
             }

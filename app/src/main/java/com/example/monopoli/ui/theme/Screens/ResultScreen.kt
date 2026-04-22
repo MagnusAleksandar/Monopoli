@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -20,37 +22,48 @@ import com.example.monopoli.viewmodels.GameViewModel
 fun ResultScreen(gameViewModel: GameViewModel) {
 
     val gameState by gameViewModel.gameState.observeAsState()
+    val players = gameState?.players?.sortedByDescending { it.money }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
+            .systemBarsPadding()
+            .navigationBarsPadding()
             .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         Text(
-            text = "¡Fin del juego!",
-            color = Color.Red,
-            fontSize = 34.sp,
-            fontWeight = FontWeight.Bold
+            "RESULTADOS",
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Yellow
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
-
-        gameState?.players?.forEach {
-            Text("${it.name}: $${it.money}", color = Color.White)
+        Column(modifier = Modifier.weight(1f)) {
+            players?.forEachIndexed { index, player ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("#${index + 1} ${player.name}")
+                        Text("$${player.money}")
+                    }
+                }
+            }
         }
 
-        Spacer(modifier = Modifier.height(30.dp))
-
         Button(
-            onClick = { gameViewModel.gameState },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
+            onClick = {},
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Volver", color = Color.White)
+            Text("Volver")
         }
     }
 }

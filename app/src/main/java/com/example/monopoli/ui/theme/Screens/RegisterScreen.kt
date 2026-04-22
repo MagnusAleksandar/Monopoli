@@ -3,6 +3,7 @@ package com.example.monopoli.ui.theme.Screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -44,136 +45,95 @@ fun RegisterScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
 
             Text(
-                text = "TÍO RICO",
-                fontSize = 36.sp,
+                text = "REGISTRO",
+                fontSize = 34.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFFFF0000)
+                color = Color(0xFFFFD600)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 
-            Text(
-                text = "Crear cuenta",
-                fontSize = 18.sp,
-                color = Color.White
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            // Campo email
-            TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("E-mail", color = Color(0xFFFF0000)) },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    cursorColor = Color(0xFFFF0000),
-                    focusedIndicatorColor = Color(0xFFFF0000),
-                    unfocusedIndicatorColor = Color.Gray
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Campo contraseña
-            TextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Contraseña", color = Color(0xFFFF0000)) },
-                visualTransformation = PasswordVisualTransformation(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    cursorColor = Color(0xFFFF0000),
-                    focusedIndicatorColor = Color(0xFFFF0000),
-                    unfocusedIndicatorColor = Color.Gray
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Campo confirmar contraseña
-            TextField(
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it },
-                label = { Text("Confirmar contraseña", color = Color(0xFFFF0000)) },
-                visualTransformation = PasswordVisualTransformation(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    cursorColor = Color(0xFFFF0000),
-                    focusedIndicatorColor = Color(0xFFFF0000),
-                    unfocusedIndicatorColor = Color.Gray
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            // Botón registrarse
-            Button(
-                onClick = {
-                    localError = null
-                    when {
-                        password.length < 6 ->
-                            localError = "La contraseña debe tener al menos 6 caracteres"
-                        password != confirmPassword ->
-                            localError = "Las contraseñas no coinciden"
-                        else -> viewModel.register(email, password)
-                    }
-                },
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                enabled = uiState !is AuthUiState.Loading,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.95f)
+                ),
+                shape = RoundedCornerShape(20.dp)
             ) {
-                Text("Registrarse", color = Color.White)
+                Column(modifier = Modifier.padding(20.dp)) {
+
+                    TextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("E-mail") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    TextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Contraseña") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    TextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        label = { Text("Confirmar contraseña") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Button(
+                        onClick = {
+                            localError = null
+                            when {
+                                password.length < 6 ->
+                                    localError = "Mínimo 6 caracteres"
+                                password != confirmPassword ->
+                                    localError = "No coinciden"
+                                else -> viewModel.register(email, password)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Registrarse")
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    TextButton(onClick = onNavigateBack) {
+                        Text("Volver al login")
+                    }
+                }
             }
 
-            // Errores locales (contraseñas no coinciden, etc.)
             localError?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
+                Text(it, color = Color.Red, modifier = Modifier.padding(top = 10.dp))
             }
 
-            // Errores del ViewModel (Firebase)
             if (uiState is AuthUiState.Error) {
                 Text(
                     text = (uiState as AuthUiState.Error).message,
                     color = Color.Red,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            TextButton(onClick = onNavigateBack) {
-                Text(
-                    text = "¿Ya tienes cuenta? Inicia sesión",
-                    color = Color.White,
-                    fontSize = 14.sp
+                    modifier = Modifier.padding(top = 10.dp)
                 )
             }
         }
 
-        // Loading overlay
         if (uiState is AuthUiState.Loading) {
             Box(
                 modifier = Modifier
@@ -181,10 +141,7 @@ fun RegisterScreen(
                     .background(Color.Black.copy(alpha = 0.4f)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(
-                    color = Color(0xFFFF0000),
-                    strokeWidth = 4.dp
-                )
+                CircularProgressIndicator()
             }
         }
     }

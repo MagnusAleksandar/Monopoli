@@ -3,6 +3,7 @@ package com.example.monopoli.ui.theme.Screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -21,119 +22,76 @@ import com.example.monopoli.models.AuthUiState
 import com.example.monopoli.viewmodels.AuthViewModel
 
 @Composable
-fun LoginScreen(viewModel: AuthViewModel,onNavigateToRegister: () -> Unit) {
-
+fun LoginScreen(
+    viewModel: AuthViewModel,
+    onNavigateToRegister: () -> Unit
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0D47A1))
+            .systemBarsPadding()
+            .navigationBarsPadding()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-        Image(
-            painter = painterResource(R.drawable.fondo2),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            "TÍO RICO",
+            fontSize = 34.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFFFD600)
         )
 
+
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Center
         ) {
 
-
-            Text(
-                text = "TÍO RICO",
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFFFF0000)
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("E-mail", color = Color(0xFFFF0000)) },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    cursorColor = Color(0xFFFF0000),
-                    focusedIndicatorColor = Color(0xFFFF0000),
-                    unfocusedIndicatorColor = Color.Gray
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password", color = Color(0xFFF60505)) },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    cursorColor = Color(0xFFFF0000),
-                    focusedIndicatorColor = Color(0xFFFF0000),
-                    unfocusedIndicatorColor = Color.Gray
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Button(
-                onClick = { viewModel.login(email, password) },
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                enabled = uiState !is AuthUiState.Loading,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
+                shape = RoundedCornerShape(16.dp)
             ) {
-                Text("Iniciar Sesión", color = Color.White)
-            }
+                Column(modifier = Modifier.padding(16.dp)) {
 
-            Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Email") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-            TextButton(onClick = onNavigateToRegister) {
-                Text(
-                    text = "¿No tienes cuenta? Regístrate",
-                    color = Color.White,
-                    fontSize = 14.sp
-                )
-            }
+                    Spacer(modifier = Modifier.height(12.dp))
 
-            if (uiState is AuthUiState.Error) {
-                Text(
-                    text = (uiState as AuthUiState.Error).message,
-                    color = Color.Red,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Password") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Button(
+                        onClick = { viewModel.login(email, password) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Iniciar sesión")
+                    }
+                }
             }
         }
 
-        if (uiState is AuthUiState.Loading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.4f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = Color(0xFFFF0000),
-                    strokeWidth = 4.dp
-                )
-            }
+        TextButton(onClick = onNavigateToRegister) {
+            Text("Crear cuenta", color = Color.White)
         }
-
     }
 }
-
-

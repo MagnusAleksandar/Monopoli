@@ -23,76 +23,55 @@ fun GameScreen(gameViewModel: GameViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1565C0))
+            .background(Color(0xFF0D47A1))
+            .systemBarsPadding()
+            .navigationBarsPadding()
             .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // 🎮 TÍTULO
         Text(
-            text = "TÍO RICO",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFFFFD600)
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // 📊 INFO DEL JUEGO
-        Text(
-            text = "Turno: ${gameState?.playerNum}",
+            "TURNO: ${gameState?.playerNum}",
             color = Color.White
         )
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // 👥 JUGADORES
-        gameState?.players?.forEach { player ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(0.8f),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Text(
-                    text = "${player.name}: $${player.money}",
-                    modifier = Modifier.padding(12.dp),
-                    color = Color.Black
-                )
+        // LISTA
+        Column(modifier = Modifier.weight(1f)) {
+            gameState?.players?.forEach {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Text(
+                        "${it.name}: $${it.money}",
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
         }
 
-        Spacer(modifier = Modifier.height(30.dp))
-
-        // 🎮 BOTONES
+        // BOTONES
         Button(
             onClick = { gameViewModel.onPlay('u') },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
-        ) {
-            Text("Ahorrar", color = Color.White)
-        }
+            modifier = Modifier.fillMaxWidth()
+        ) { Text("Ahorrar") }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = { gameViewModel.onPlay('i') },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
-        ) {
-            Text("Invertir", color = Color.White)
-        }
+            modifier = Modifier.fillMaxWidth()
+        ) { Text("Invertir") }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = { gameViewModel.onPlay('d') },
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
-        ) {
-            Text("Gastar", color = Color.White)
-        }
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+        ) { Text("Gastar") }
     }
 }

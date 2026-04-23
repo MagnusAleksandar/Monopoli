@@ -7,22 +7,26 @@ class Turn (private val gameState: GameState, private val interest: Float, priva
     private val player = gameState.currPlayer
     val possOutcomes = listOf<Char>('g', 'l') // Resultados posibles de invertir (ganar: gain - g, perder: loss - l)
 
-    fun play (move: Char): GameState?{ // Jugada
-
-        var newState = when (move){ // El jugador elige una jugada
+    fun play(move: Char): Pair<GameState, Boolean>? {
+        var newState = when (move) {
             'u' -> save()
             'i' -> monUpDown()
             'd' -> spend()
-            else -> return null // Jugada inválida, turno finaliza
+            else -> return null
         }
 
-        if (Random.nextBoolean()){ // Evento aleatorio
-            val secondaryTurn = Turn(newState, interest, spent)
-            newState = secondaryTurn.monUpDown()
+        var eventOccurred = false
+        if (Random.nextBoolean()) {
+            eventOccurred = true
+            val updatedPlayers = newState.players.toMutableList()
+            val secondaryTurn = Turn(gameState, interest, spent)
+            val eventState = secondaryTurn.monUpDown()
+            updatedPlayers[gameState.playerNum] = newState.players[gameState.playerNum]
+                .copy(money = eventState.players[gameState.playerNum].money)
+            newState = newState.copy(players = updatedPlayers)
         }
 
-        return newState
-
+        return Pair(newState, eventOccurred)
     }
 
     private fun Player.toNewGameState(): GameState {

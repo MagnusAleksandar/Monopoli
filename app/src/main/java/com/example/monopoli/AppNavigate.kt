@@ -79,6 +79,7 @@ fun AppNavigation(
     LaunchedEffect(gameStarted) {
         if (gameStarted) {
             roomState?.players?.let { players ->
+                gameViewModel.roomCode = roomViewModel.roomCode.value ?: ""
                 gameViewModel.initGame(players)
             }
             roomViewModel.resetGameStarted()

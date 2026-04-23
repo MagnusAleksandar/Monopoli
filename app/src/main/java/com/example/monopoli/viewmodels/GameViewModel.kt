@@ -7,46 +7,55 @@ import com.example.monopoli.models.GameState
 import com.example.monopoli.models.Player
 import com.example.monopoli.models.Turn
 import com.example.monopoli.repositories.RoomRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 //Recibe jugadores de la sala
-    class GameViewModel : ViewModel() {
-        lateinit var roomCode: String
-        private val roomRepository = RoomRepository()
+class GameViewModel : ViewModel() {
+    private val _randomEventOccurred = MutableStateFlow(false)
+    val randomEventOccurred: StateFlow<Boolean> = _randomEventOccurred
 
-        private val INTEREST = .15f
+    lateinit var roomCode: String
+    private val roomRepository = RoomRepository()
 
-        private val _gameState = MutableLiveData<GameState>()
-        val gameState: LiveData<GameState> = _gameState
+    private val INTEREST = .15f
 
-        fun initGame(players: Map<String, String>) {
-            val playerList = players.map { (id, name) ->
-                Player(name = name, id = id, playing = true)
-            }
-            _gameState.value = GameState(playerList)
+    private val _gameState = MutableLiveData<GameState>()
+    val gameState: LiveData<GameState> = _gameState
+
+    private var gameInitialized = false
+
+    fun initGame(players: Map<String, String>) {
+        val playerList = players.map { (id, name) ->
+            Player(name = name, id = id, playing = true)
         }
-
-        private fun turn() = Turn(_gameState.value!!, INTEREST, null)
-
-        fun onPlay(choice: Char, playerID: String?) {
-            val currentState = _gameState.value ?: return
-
-            val currentPlayer = currentState.currPlayer
-            if (!currentState.currPlayer.playing) return
-
-            // No puede jugar si no es su turno
-            if (currentPlayer.name != playerID) return
-
-            // No puede jugar si se acabó el juego
-            if (currentState.isFinished) return
-            val newState = turn().play(choice)?: return
-            _gameState.value = newState
-
-            if(newState.isFinished){
-                roomRepository.endGame(roomCode)
+        _gameState.value = GameState(playerList)
+        roomRepository.listenGameState(roomCode) { newState ->
+            if (gameInitialized) {
+                _gameState.postValue(newState)
             } else {
-                roomRepository.updateGameState(roomCode, newState)
+                gameInitialized = true
             }
-
         }
     }
 
+    private fun turn() = Turn(_gameState.value!!, INTEREST, null)
+
+    fun onPlay(choice: Char, playerID: String?) {
+        val currentState = _gameState.value ?: return
+        val currentPlayer = currentState.currPlayer
+        if (!currentPlayer.playing) return
+        if (currentPlayer.id != playerID) return
+        if (currentState.isFinished) return
+
+        val result = turn().play(choice) ?: return
+        val (newState, eventOccurred) = result
+        _randomEventOccurred.value = eventOccurred
+
+        if (newState.isFinished) {
+            roomRepository.deleteRoom(roomCode)
+        } else {
+            roomRepository.updateGameState(roomCode, newState)
+        }
+    }
+}

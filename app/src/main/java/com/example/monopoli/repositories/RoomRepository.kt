@@ -1,6 +1,7 @@
 package com.example.monopoli.repositories
 
 import com.example.monopoli.models.GameState
+import com.example.monopoli.models.Player
 import com.example.monopoli.models.Room
 import com.google.firebase.database.*
 import com.google.firebase.database.FirebaseDatabase
@@ -52,6 +53,46 @@ class RoomRepository {
         }
     }
 
+    fun listenGameState(roomCode: String, onChange: (GameState) -> Unit) {
+        db.child("rooms").child(roomCode).child("gameState")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val playerNum = snapshot.child("playerNum").getValue(Int::class.java) ?: 0
+                    val isFinished = snapshot.child("isFinished").getValue(Boolean::class.java) ?: false
+                    val turns = snapshot.child("turns").children.map {
+                        it.getValue(Int::class.java) ?: 0
+                    }
+                    val players = snapshot.child("players").children.mapNotNull { playerSnap ->
+                        val id = playerSnap.key ?: return@mapNotNull null
+                        val name = playerSnap.child("name").getValue(String::class.java) ?: ""
+                        val money = playerSnap.child("money").getValue(Float::class.java) ?: 1000f
+                        val playing = playerSnap.child("playing").getValue(Boolean::class.java) ?: true
+                        Player(id = id, name = name, money = money, playing = playing)
+                    }
+                    if (players.isNotEmpty()) {
+                        onChange(GameState(players, playerNum, turns, isFinished = isFinished))
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            })
+    }
+
+    fun updateGameState(roomCode: String, newState: GameState) {
+        val data = mapOf(
+            "playerNum" to newState.playerNum,
+            "turns" to newState.turns,
+            "isFinished" to newState.isFinished,
+            "players" to newState.players.associate { player ->
+                player.id to mapOf(
+                    "name" to player.name,
+                    "money" to player.money,
+                    "playing" to player.playing
+                )
+            }
+        )
+        db.child("rooms").child(roomCode).child("gameState").updateChildren(data)
+    }
+
     fun listenRoom(roomCode: String, onChange: (Room) -> Unit) {
 
         db.child("rooms").child(roomCode)
@@ -82,23 +123,13 @@ class RoomRepository {
         db.child("rooms").child(roomCode).child("status").setValue("playing")
     }
 
-    fun endGame(roomCode: String){
-        // código que elimina la sala
+    //Usamos funcion para eliminar
+    fun removePlayer(roomCode: String, userId: String) {
+        db.child("rooms").child(roomCode).child("players").child(userId).removeValue()
     }
-
-    fun updateGameState(roomCode: String, newState: GameState){
-        // código que actualiza la sala
-        /* Sugerencia de GPT:
-        val gameRef = database.child("games").child(roomCode)
-
-        val data = mapOf(
-            "curr_player" to gameState.currPlayer.id,
-            "round_num" to gameState.turns.maxOrNull(),
-            "status" to if (gameState.isFinished) "finished" else "playing"
-        )
-
-        gameRef.updateChildren(data)
-         */
+    //Usamos funcion removeValue para eliminar la sala
+    fun deleteRoom(roomCode: String) {
+        db.child("rooms").child(roomCode).removeValue()
     }
 
 }

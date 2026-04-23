@@ -1,5 +1,6 @@
 package com.example.monopoli.ui.theme.Screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -9,6 +10,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
@@ -22,6 +24,14 @@ fun GameScreen(gameViewModel: GameViewModel, myPlayerId: String?) {
     val gameState by gameViewModel.gameState.observeAsState()
     val isMyTurn = gameState?.currPlayer?.id == myPlayerId
     val isGameFinished = gameState?.isFinished == true
+    val randomEventOccurred by gameViewModel.randomEventOccurred.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(randomEventOccurred) {
+        if (randomEventOccurred) {
+            Toast.makeText(context, "¡Evento aleatorio!", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Column(
         modifier = Modifier

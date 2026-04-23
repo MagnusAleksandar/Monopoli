@@ -54,7 +54,7 @@ fun GameScreen(gameViewModel: GameViewModel, myPlayerId: String?) {
 
         // 📊 INFO DEL JUEGO
         Text(
-            text = "Turno: ${gameState?.playerNum}",
+            text = "Turno: ${gameState?.players}",
             color = Color.White
         )
 
